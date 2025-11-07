@@ -16,13 +16,12 @@ export const ProjectsPage = () => {
   const [page, setPage] = useState(1);
   const [departmentData, setDepartmentData] = useState(null);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [fileTypeFilter, setFileTypeFilter] = useState('');
 
-  // First, fetch the department to get its MongoDB ID
   useEffect(() => {
     const fetchDepartment = async () => {
       try {
         const dept = await departmentService.getDepartmentBySlug(departmentId);
-        console.log('📋 Department data for projects:', dept);
         setDepartmentData(dept);
       } catch (error) {
         console.error('Failed to fetch department details:', error);
@@ -34,18 +33,13 @@ export const ProjectsPage = () => {
     }
   }, [departmentId]);
 
-  // Then fetch projects using the department's MongoDB ID
   useEffect(() => {
     const fetchProjects = async () => {
-      if (!departmentData?._id) {
-        console.log('⏳ Waiting for department data...');
-        return;
-      }
+      if (!departmentData?._id) return;
 
       try {
         setLoading(true);
         setError(null);
-        console.log('🔍 Fetching projects for department ID:', departmentData._id);
         
         const result = await projectService.getProjectsByDepartment(departmentData._id, {
           search: searchQuery,
@@ -53,22 +47,38 @@ export const ProjectsPage = () => {
           limit: 10,
         });
         
-        console.log('📦 Full API response:', result);
-        console.log('📋 Projects array:', result.projects);
+        let filteredProjects = result.projects || [];
         
-        if (result.projects && result.projects.length > 0) {
-          console.log('🔎 First project details:', {
-            id: result.projects[0]._id,
-            title: result.projects[0].title,
-            fileUrl: result.projects[0].fileUrl,
-            hasFileUrl: !!result.projects[0].fileUrl,
+        if (searchQuery && searchQuery.trim()) {
+          const query = searchQuery.toLowerCase().trim();
+          filteredProjects = filteredProjects.filter(project => 
+            project.title?.toLowerCase().includes(query)
+          );
+        }
+        
+        if (fileTypeFilter && fileTypeFilter !== 'all') {
+          filteredProjects = filteredProjects.filter(project => {
+            const fileUrl = project.fileUrl?.toLowerCase() || '';
+            switch(fileTypeFilter) {
+              case 'pdf':
+                return fileUrl.endsWith('.pdf');
+              case 'word':
+                return fileUrl.endsWith('.docx') || fileUrl.endsWith('.doc');
+              case 'excel':
+                return fileUrl.endsWith('.xlsx') || fileUrl.endsWith('.xls');
+              case 'powerpoint':
+                return fileUrl.endsWith('.pptx') || fileUrl.endsWith('.ppt');
+              case 'image':
+                return fileUrl.endsWith('.jpg') || fileUrl.endsWith('.jpeg') || fileUrl.endsWith('.png') || fileUrl.endsWith('.gif');
+              default:
+                return true;
+            }
           });
         }
         
-        setProjects(result.projects);
-        console.log('✅ Projects loaded:', result.projects);
+        setProjects(filteredProjects);
       } catch (err) {
-        console.error('❌ Error fetching projects:', err);
+        console.error('Error fetching projects:', err);
         setError(err.message || 'Failed to load projects');
         setProjects([]);
       } finally {
@@ -77,7 +87,7 @@ export const ProjectsPage = () => {
     };
 
     fetchProjects();
-  }, [departmentData, searchQuery, page]);
+  }, [departmentData, searchQuery, page, fileTypeFilter]);
 
   return (
     <main className="flex-1 bg-white" style={{ padding: '22px 65px' }}>
@@ -151,6 +161,8 @@ export const ProjectsPage = () => {
         {/* Filter Dropdown */}
         <div style={{ position: 'relative' }}>
           <select
+            value={fileTypeFilter}
+            onChange={(e) => setFileTypeFilter(e.target.value)}
             style={{
               minWidth: '135px',
               height: '35px',
@@ -167,11 +179,12 @@ export const ProjectsPage = () => {
               flexShrink: 0,
             }}
           >
-            <option>Filter by: Document Type</option>
-            <option>PDF</option>
-            <option>Word</option>
-            <option>Excel</option>
-            <option>PowerPoint</option>
+            <option value="">All Types</option>
+            <option value="pdf">PDF</option>
+            <option value="word">Word</option>
+            <option value="excel">Excel</option>
+            <option value="powerpoint">PowerPoint</option>
+            <option value="image">Image</option>
           </select>
           <div
             style={{

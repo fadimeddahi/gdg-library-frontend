@@ -16,13 +16,12 @@ export const GuidesPage = () => {
   const [page, setPage] = useState(1);
   const [departmentData, setDepartmentData] = useState(null);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [fileTypeFilter, setFileTypeFilter] = useState('');
 
-  // First, fetch the department to get its MongoDB ID
   useEffect(() => {
     const fetchDepartment = async () => {
       try {
         const dept = await departmentService.getDepartmentBySlug(departmentId);
-        console.log('📋 Department data for guides:', dept);
         setDepartmentData(dept);
       } catch (error) {
         console.error('Failed to fetch department details:', error);
@@ -34,18 +33,13 @@ export const GuidesPage = () => {
     }
   }, [departmentId]);
 
-  // Then fetch guides using the department's MongoDB ID
   useEffect(() => {
     const fetchGuides = async () => {
-      if (!departmentData?._id) {
-        console.log('⏳ Waiting for department data...');
-        return;
-      }
+      if (!departmentData?._id) return;
 
       try {
         setLoading(true);
         setError(null);
-        console.log('🔍 Fetching guides for department ID:', departmentData._id);
         
         const result = await guideService.getGuidesByDepartment(departmentData._id, {
           search: searchQuery,
@@ -53,22 +47,38 @@ export const GuidesPage = () => {
           limit: 10,
         });
         
-        console.log('📦 Full API response:', result);
-        console.log('📋 Guides array:', result.guides);
+        let filteredGuides = result.guides || [];
         
-        if (result.guides && result.guides.length > 0) {
-          console.log('🔎 First guide details:', {
-            id: result.guides[0]._id,
-            title: result.guides[0].title,
-            fileUrl: result.guides[0].fileUrl,
-            hasFileUrl: !!result.guides[0].fileUrl,
+        if (searchQuery && searchQuery.trim()) {
+          const query = searchQuery.toLowerCase().trim();
+          filteredGuides = filteredGuides.filter(guide => 
+            guide.title?.toLowerCase().includes(query)
+          );
+        }
+        
+        if (fileTypeFilter && fileTypeFilter !== 'all') {
+          filteredGuides = filteredGuides.filter(guide => {
+            const fileUrl = guide.fileUrl?.toLowerCase() || '';
+            switch(fileTypeFilter) {
+              case 'pdf':
+                return fileUrl.endsWith('.pdf');
+              case 'word':
+                return fileUrl.endsWith('.docx') || fileUrl.endsWith('.doc');
+              case 'excel':
+                return fileUrl.endsWith('.xlsx') || fileUrl.endsWith('.xls');
+              case 'powerpoint':
+                return fileUrl.endsWith('.pptx') || fileUrl.endsWith('.ppt');
+              case 'image':
+                return fileUrl.endsWith('.jpg') || fileUrl.endsWith('.jpeg') || fileUrl.endsWith('.png') || fileUrl.endsWith('.gif');
+              default:
+                return true;
+            }
           });
         }
         
-        setGuides(result.guides);
-        console.log('✅ Guides loaded:', result.guides);
+        setGuides(filteredGuides);
       } catch (err) {
-        console.error('❌ Error fetching guides:', err);
+        console.error('Error fetching guides:', err);
         setError(err.message || 'Failed to load guides');
         setGuides([]);
       } finally {
@@ -77,7 +87,7 @@ export const GuidesPage = () => {
     };
 
     fetchGuides();
-  }, [departmentData, searchQuery, page]);
+  }, [departmentData, searchQuery, page, fileTypeFilter]);
 
   return (
     <main className="flex-1 bg-white" style={{ padding: '22px 65px' }}>
@@ -151,6 +161,8 @@ export const GuidesPage = () => {
         {/* Filter Dropdown */}
         <div style={{ position: 'relative' }}>
           <select
+            value={fileTypeFilter}
+            onChange={(e) => setFileTypeFilter(e.target.value)}
             style={{
               minWidth: '135px',
               height: '35px',
@@ -167,11 +179,12 @@ export const GuidesPage = () => {
               flexShrink: 0,
             }}
           >
-            <option>Filter by: Document Type</option>
-            <option>PDF</option>
-            <option>Word</option>
-            <option>Excel</option>
-            <option>PowerPoint</option>
+            <option value="">All Types</option>
+            <option value="pdf">PDF</option>
+            <option value="word">Word</option>
+            <option value="excel">Excel</option>
+            <option value="powerpoint">PowerPoint</option>
+            <option value="image">Image</option>
           </select>
           <div
             style={{

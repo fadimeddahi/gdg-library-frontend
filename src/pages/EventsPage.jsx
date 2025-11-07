@@ -16,13 +16,12 @@ export const EventsPage = () => {
   const [page, setPage] = useState(1);
   const [departmentData, setDepartmentData] = useState(null);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [fileTypeFilter, setFileTypeFilter] = useState('');
 
-  // First, fetch the department to get its MongoDB ID
   useEffect(() => {
     const fetchDepartment = async () => {
       try {
         const dept = await departmentService.getDepartmentBySlug(departmentId);
-        console.log('📋 Department data for events:', dept);
         setDepartmentData(dept);
       } catch (error) {
         console.error('Failed to fetch department details:', error);
@@ -34,18 +33,13 @@ export const EventsPage = () => {
     }
   }, [departmentId]);
 
-  // Then fetch events using the department's MongoDB ID
   useEffect(() => {
     const fetchEvents = async () => {
-      if (!departmentData?._id) {
-        console.log('⏳ Waiting for department data...');
-        return;
-      }
+      if (!departmentData?._id) return;
 
       try {
         setLoading(true);
         setError(null);
-        console.log('🔍 Fetching events for department ID:', departmentData._id);
         
         const result = await eventService.getEventsByDepartment(departmentData._id, {
           search: searchQuery,
@@ -53,22 +47,38 @@ export const EventsPage = () => {
           limit: 10,
         });
         
-        console.log('📦 Full API response:', result);
-        console.log('📋 Events array:', result.events);
+        let filteredEvents = result.events || [];
         
-        if (result.events && result.events.length > 0) {
-          console.log('🔎 First event details:', {
-            id: result.events[0]._id,
-            title: result.events[0].title,
-            fileUrl: result.events[0].fileUrl,
-            hasFileUrl: !!result.events[0].fileUrl,
+        if (searchQuery && searchQuery.trim()) {
+          const query = searchQuery.toLowerCase().trim();
+          filteredEvents = filteredEvents.filter(event => 
+            event.title?.toLowerCase().includes(query)
+          );
+        }
+        
+        if (fileTypeFilter && fileTypeFilter !== 'all') {
+          filteredEvents = filteredEvents.filter(event => {
+            const fileUrl = event.fileUrl?.toLowerCase() || '';
+            switch(fileTypeFilter) {
+              case 'pdf':
+                return fileUrl.endsWith('.pdf');
+              case 'word':
+                return fileUrl.endsWith('.docx') || fileUrl.endsWith('.doc');
+              case 'excel':
+                return fileUrl.endsWith('.xlsx') || fileUrl.endsWith('.xls');
+              case 'powerpoint':
+                return fileUrl.endsWith('.pptx') || fileUrl.endsWith('.ppt');
+              case 'image':
+                return fileUrl.endsWith('.jpg') || fileUrl.endsWith('.jpeg') || fileUrl.endsWith('.png') || fileUrl.endsWith('.gif');
+              default:
+                return true;
+            }
           });
         }
         
-        setEvents(result.events);
-        console.log('✅ Events loaded:', result.events);
+        setEvents(filteredEvents);
       } catch (err) {
-        console.error('❌ Error fetching events:', err);
+        console.error('Error fetching events:', err);
         setError(err.message || 'Failed to load events');
         setEvents([]);
       } finally {
@@ -77,7 +87,7 @@ export const EventsPage = () => {
     };
 
     fetchEvents();
-  }, [departmentData, searchQuery, page]);
+  }, [departmentData, searchQuery, page, fileTypeFilter]);
 
   return (
     <main className="flex-1 bg-white" style={{ padding: '22px 65px' }}>
@@ -151,6 +161,8 @@ export const EventsPage = () => {
         {/* Filter Dropdown */}
         <div style={{ position: 'relative' }}>
           <select
+            value={fileTypeFilter}
+            onChange={(e) => setFileTypeFilter(e.target.value)}
             style={{
               minWidth: '135px',
               height: '35px',
@@ -167,11 +179,12 @@ export const EventsPage = () => {
               flexShrink: 0,
             }}
           >
-            <option>Filter by: Document Type</option>
-            <option>PDF</option>
-            <option>Word</option>
-            <option>Excel</option>
-            <option>PowerPoint</option>
+            <option value="">All Types</option>
+            <option value="pdf">PDF</option>
+            <option value="word">Word</option>
+            <option value="excel">Excel</option>
+            <option value="powerpoint">PowerPoint</option>
+            <option value="image">Image</option>
           </select>
           <div
             style={{
