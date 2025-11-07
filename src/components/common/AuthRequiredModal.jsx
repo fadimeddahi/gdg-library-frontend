@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { useAuth } from '../../context/useAuth';
 
 export const AuthRequiredModal = ({ 
@@ -23,15 +24,13 @@ export const AuthRequiredModal = ({
     setLoading(true);
 
     try {
-      console.log('🔐 Attempting login for protected action...');
       await login(email, password);
-      console.log('✅ Login successful');
       setEmail('');
       setPassword('');
+      toast.success('Login successful!');
       onAuthSuccess();
       onClose();
     } catch (err) {
-      console.error('❌ Login failed:', err);
       setError(err.message || 'Login failed. Please try again.');
     } finally {
       setLoading(false);
@@ -44,15 +43,13 @@ export const AuthRequiredModal = ({
     setLoading(true);
 
     try {
-      console.log('📝 Creating account...');
       await signup(email, password);
-      console.log('✅ Signup successful');
       setEmail('');
       setPassword('');
+      toast.success('Account created successfully!');
       onAuthSuccess();
       onClose();
     } catch (err) {
-      console.error('❌ Signup failed:', err);
       setError(err.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);

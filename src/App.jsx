@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom';
 import { useState, useEffect, Suspense } from 'react';
+import { Toaster } from 'react-hot-toast';
 import './App.css'
 import { Sidebar } from './components/layout/Sidebar'
 import { Header } from './components/layout/Header'
@@ -26,12 +27,10 @@ function HomePage() {
 
   const fetchSavedFolders = async () => {
     try {
-      console.log('📚 HomePage: Fetching saved folders...');
       const folders = await savedFolderService.getAllSavedFolders();
       setSavedFolders(folders);
-      console.log('✅ HomePage: Loaded', folders.length, 'saved folders');
     } catch (error) {
-      console.error('❌ HomePage Error fetching saved folders:', error);
+      console.error('Error fetching saved folders:', error);
     } finally {
       setLoading(false);
     }
@@ -192,7 +191,37 @@ function MainLayout() {
 }
 
 function App() {
-  return <MainLayout />
+  return (
+    <>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+            fontFamily: 'Poppins',
+            fontSize: '14px',
+          },
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: '#4285F4',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            duration: 4000,
+            iconTheme: {
+              primary: '#EF4444',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
+      <MainLayout />
+    </>
+  );
 }
 
 export default App

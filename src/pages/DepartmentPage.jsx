@@ -1,6 +1,7 @@
 import { Plus, MoreVertical, FileText, Calendar } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { savedFolderService } from '../services/savedFolderService';
 import { useAuthorization } from '../hooks/useAuthorization';
 import { AuthRequiredModal } from '../components/common/AuthRequiredModal';
@@ -14,10 +15,8 @@ export const DepartmentPage = ({ departmentId, departmentName, departmentObjectI
   // Fetch saved folders on mount
   const checkSavedFolders = useCallback(async () => {
     try {
-      console.log('🔍 Checking saved folders for', departmentId);
       const response = await savedFolderService.getAllSavedFolders();
       
-      // Create a Set of saved folderTypes for this department
       const saved = new Set(
         response
           .filter(f => f.departmentSlug === departmentId)
@@ -25,9 +24,8 @@ export const DepartmentPage = ({ departmentId, departmentName, departmentObjectI
       );
       
       setSavedFolders(saved);
-      console.log('✅ Saved folders checked:', Array.from(saved));
     } catch (error) {
-      console.error('❌ Error checking saved folders:', error);
+      console.error('Error checking saved folders:', error);
     }
   }, [departmentId]);
 
@@ -46,19 +44,13 @@ export const DepartmentPage = ({ departmentId, departmentName, departmentObjectI
   };
 
   const handleSaveFolder = async (folder) => {
-    // Check authorization - just needs to be authenticated
     if (!checkAuthorization('visitor', 'save folders to your library')) {
       return;
     }
 
     try {
-      console.log('💾 Saving folder:', folder, 'for department:', departmentId);
-      console.log('📊 Department Object ID:', departmentObjectId);
-
-      // Get folder type from name
       const folderType = getFolderTypeFromName(folder);
 
-      // Prepare folder data
       const folderData = {
         department: departmentObjectId,
         folderType: folderType,
@@ -68,30 +60,21 @@ export const DepartmentPage = ({ departmentId, departmentName, departmentObjectI
         color: getFolderColor(folder),
       };
 
-      console.log('🎯 Folder data to send:', folderData);
-
-      // Save to backend
-      const result = await savedFolderService.saveFolder(folderData);
-      console.log('🎉 Save result:', result);
-
-      // Refresh saved folders list
+      await savedFolderService.saveFolder(folderData);
       await checkSavedFolders();
       
       setOpenMenuId(null);
       
-      console.log('✅ Folder saved successfully');
-      alert(`✅ "${folder}" saved to your library!`);
+      toast.success(`"${folder}" saved to your library!`);
     } catch (error) {
-      console.error('❌ Error saving folder:', error);
-      console.error('📋 Full error object:', error);
+      console.error('Error saving folder:', error);
       
-      // Check if it's already saved
       if (error.message.includes('already in your library')) {
-        alert('This folder is already in your library');
+        toast.error('This folder is already in your library');
       } else if (error.message.includes('Server error')) {
-        alert(`Server error: ${error.message}`);
+        toast.error(`Server error: ${error.message}`);
       } else {
-        alert(`Failed to save folder: ${error.message}`);
+        toast.error(`Failed to save folder: ${error.message}`);
       }
     }
   };
