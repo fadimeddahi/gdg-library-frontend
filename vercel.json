@@ -3,7 +3,6 @@
   "devCommand": "npm run dev",
   "installCommand": "npm ci --no-optional",
   "framework": "vite",
-  "outputDirectory": "dist",
-  "nodeVersion": "20.x"
+  "outputDirectory": "dist"
 }
 
