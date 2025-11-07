@@ -4,8 +4,6 @@ export const RecentFileCard = ({ id, title, fileUrl, collection, onClick }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleClick = async () => {
-    console.log('🔍 Card clicked:', { id, title, fileUrl, collection });
-    
     // If there's a custom onClick handler, use it
     if (onClick) {
       onClick();
@@ -14,18 +12,16 @@ export const RecentFileCard = ({ id, title, fileUrl, collection, onClick }) => {
 
     // If no fileUrl, do nothing
     if (!fileUrl) {
-      console.log('⚠️ No file attached to this item');
       alert('No file attached to this item yet. Please ask the backend team to add file URLs.');
       return;
     }
 
     setIsLoading(true);
-    console.log(`📂 Opening file from: ${fileUrl}`);
     
     try {
       // Increment view count
-      console.log(`📊 Incrementing views for ${collection}/${id}`);
-      const response = await fetch(`http://localhost:5000/api/v1/${collection}/${id}/views`, {
+      const apiUrl = import.meta.env.VITE_API_URL;
+      const response = await fetch(`${apiUrl}/${collection}/${id}/views`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -33,16 +29,13 @@ export const RecentFileCard = ({ id, title, fileUrl, collection, onClick }) => {
       });
       
       if (!response.ok) {
-        console.warn(`⚠️ View increment failed with status ${response.status}`);
-      } else {
-        console.log('✅ View count incremented');
+        console.warn(`View increment failed with status ${response.status}`);
       }
 
       // Open file in new tab
-      console.log(`🌐 Opening file in new tab`);
       window.open(fileUrl, '_blank');
     } catch (error) {
-      console.error('❌ Error opening file:', error);
+      console.error('Error opening file:', error);
     } finally {
       setIsLoading(false);
     }

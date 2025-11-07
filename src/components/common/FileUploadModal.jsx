@@ -87,15 +87,14 @@ export const FileUploadModal = ({ isOpen, onClose, collection, departmentObjectI
     setError('');
 
     try {
-      console.log('📤 Uploading file to', collection);
-      
       const formData = new FormData();
       formData.append('department', departmentObjectId);
       formData.append('title', title.trim());
       formData.append('file', file);
 
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/v1/${collection}/upload`, {
+      const apiUrl = import.meta.env.VITE_API_URL;
+      const response = await fetch(`${apiUrl}/${collection}/upload`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
