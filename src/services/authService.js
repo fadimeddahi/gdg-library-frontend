@@ -129,9 +129,10 @@ export const authService = {
       body: JSON.stringify({ email, password }),
     });
 
-    // Store token if provided
-    if (data?.token) {
-      localStorage.setItem('token', data.token);
+    // Store token if provided (handle nested structure)
+    const token = data?.data?.token || data?.token;
+    if (token) {
+      localStorage.setItem('token', token);
     }
 
     return data;
@@ -159,9 +160,10 @@ export const authService = {
       body: JSON.stringify({ email, password }),
     });
 
-    // Store token if provided
-    if (data?.token) {
-      localStorage.setItem('token', data.token);
+    // Store token if provided (handle nested structure)
+    const token = data?.data?.token || data?.token;
+    if (token) {
+      localStorage.setItem('token', token);
     }
 
     return data;

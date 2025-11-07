@@ -1,20 +1,69 @@
 import { Search, Plus } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { RecentFileCard } from '../components/resources/RecentFileCard';
+import eventService from '../services/eventService';
+import { departmentService } from '../services/departmentService';
 
 export const EventsPage = () => {
   const { departmentId } = useParams();
   const navigate = useNavigate();
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [departmentData, setDepartmentData] = useState(null);
 
-  // Mock files data
-  const files = [
-    { id: 1, title: 'DevFest 2024 Plan.pdf' },
-    { id: 2, title: 'Workshop Schedule.docx' },
-    { id: 3, title: 'Event Budget.xlsx' },
-    { id: 4, title: 'Speaker List.pdf' },
-    { id: 5, title: 'Venue Details.docx' },
-    { id: 6, title: 'Marketing Plan.pptx' },
-  ];
+  // First, fetch the department to get its MongoDB ID
+  useEffect(() => {
+    const fetchDepartment = async () => {
+      try {
+        const dept = await departmentService.getDepartmentBySlug(departmentId);
+        console.log('📋 Department data for events:', dept);
+        setDepartmentData(dept);
+      } catch (error) {
+        console.error('Failed to fetch department details:', error);
+      }
+    };
+
+    if (departmentId) {
+      fetchDepartment();
+    }
+  }, [departmentId]);
+
+  // Then fetch events using the department's MongoDB ID
+  useEffect(() => {
+    const fetchEvents = async () => {
+      if (!departmentData?._id) {
+        console.log('⏳ Waiting for department data...');
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError(null);
+        console.log('🔍 Fetching events for department ID:', departmentData._id);
+        
+        const result = await eventService.getEventsByDepartment(departmentData._id, {
+          search: searchQuery,
+          page: page,
+          limit: 10,
+        });
+        
+        setEvents(result.events);
+        console.log('✅ Events loaded:', result.events);
+      } catch (err) {
+        console.error('❌ Error fetching events:', err);
+        setError(err.message || 'Failed to load events');
+        setEvents([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, [departmentData, searchQuery, page]);
 
   return (
     <main className="flex-1 bg-white" style={{ padding: '22px 65px' }}>
@@ -66,6 +115,11 @@ export const EventsPage = () => {
           <input
             type="text"
             placeholder="Search"
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setPage(1);
+            }}
             style={{
               width: '100%',
               height: '35px',
@@ -154,20 +208,58 @@ export const EventsPage = () => {
           </button>
         </div>
 
+        {/* Loading State */}
+        {loading && (
+          <div style={{ textAlign: 'center', padding: '40px', color: '#6B7280' }}>
+            <p style={{ fontFamily: 'Poppins', fontSize: '13px' }}>Loading events...</p>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && !loading && (
+          <div style={{
+            textAlign: 'center',
+            padding: '40px',
+            color: '#EF4444',
+            backgroundColor: '#FEE2E2',
+            borderRadius: '8px',
+            fontFamily: 'Poppins',
+            fontSize: '13px',
+          }}>
+            <p>❌ {error}</p>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!loading && !error && events.length === 0 && (
+          <div style={{
+            textAlign: 'center',
+            padding: '40px',
+            color: '#6B7280',
+            fontFamily: 'Poppins',
+            fontSize: '13px',
+          }}>
+            <p>📁 No events yet</p>
+            <p style={{ fontSize: '11px', marginTop: '8px' }}>Events will appear here once they're uploaded to this department</p>
+          </div>
+        )}
+
         {/* Files Grid */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 220px)',
-          gap: '15px',
-        }}>
-          {files.map((file) => (
-            <RecentFileCard
-              key={file.id}
-              title={file.title}
-              onClick={() => console.log(`Clicked: ${file.title}`)}
-            />
-          ))}
-        </div>
+        {!loading && events.length > 0 && (
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 220px)',
+            gap: '15px',
+          }}>
+            {events.map((event) => (
+              <RecentFileCard
+                key={event._id}
+                title={event.title}
+                onClick={() => console.log(`Clicked: ${event.title}`)}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </main>
   );

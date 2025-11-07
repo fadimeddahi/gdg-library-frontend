@@ -1,20 +1,69 @@
 import { Search, Plus, MoreVertical } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { RecentFileCard } from '../components/resources/RecentFileCard';
+import projectService from '../services/projectService';
+import { departmentService } from '../services/departmentService';
 
 export const ProjectsPage = () => {
   const { departmentId } = useParams();
   const navigate = useNavigate();
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [departmentData, setDepartmentData] = useState(null);
 
-  // Mock files data
-  const files = [
-    { id: 1, title: 'Project Proposal.pdf' },
-    { id: 2, title: 'Design Mockups.fig' },
-    { id: 3, title: 'Meeting Notes.docx' },
-    { id: 4, title: 'Budget Report.xlsx' },
-    { id: 5, title: 'Presentation.pptx' },
-    { id: 6, title: 'Timeline.pdf' },
-  ];
+  // First, fetch the department to get its MongoDB ID
+  useEffect(() => {
+    const fetchDepartment = async () => {
+      try {
+        const dept = await departmentService.getDepartmentBySlug(departmentId);
+        console.log('📋 Department data for projects:', dept);
+        setDepartmentData(dept);
+      } catch (error) {
+        console.error('Failed to fetch department details:', error);
+      }
+    };
+
+    if (departmentId) {
+      fetchDepartment();
+    }
+  }, [departmentId]);
+
+  // Then fetch projects using the department's MongoDB ID
+  useEffect(() => {
+    const fetchProjects = async () => {
+      if (!departmentData?._id) {
+        console.log('⏳ Waiting for department data...');
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError(null);
+        console.log('🔍 Fetching projects for department ID:', departmentData._id);
+        
+        const result = await projectService.getProjectsByDepartment(departmentData._id, {
+          search: searchQuery,
+          page: page,
+          limit: 10,
+        });
+        
+        setProjects(result.projects);
+        console.log('✅ Projects loaded:', result.projects);
+      } catch (err) {
+        console.error('❌ Error fetching projects:', err);
+        setError(err.message || 'Failed to load projects');
+        setProjects([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, [departmentData, searchQuery, page]);
 
   return (
     <main className="flex-1 bg-white" style={{ padding: '22px 65px' }}>
@@ -66,6 +115,11 @@ export const ProjectsPage = () => {
           <input
             type="text"
             placeholder="Search"
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setPage(1); // Reset to first page on search
+            }}
             style={{
               width: '100%',
               height: '35px',
@@ -154,20 +208,58 @@ export const ProjectsPage = () => {
           </button>
         </div>
 
+        {/* Loading State */}
+        {loading && (
+          <div style={{ textAlign: 'center', padding: '40px', color: '#6B7280' }}>
+            <p style={{ fontFamily: 'Poppins', fontSize: '13px' }}>Loading projects...</p>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && !loading && (
+          <div style={{
+            textAlign: 'center',
+            padding: '40px',
+            color: '#EF4444',
+            backgroundColor: '#FEE2E2',
+            borderRadius: '8px',
+            fontFamily: 'Poppins',
+            fontSize: '13px',
+          }}>
+            <p>❌ {error}</p>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!loading && !error && projects.length === 0 && (
+          <div style={{
+            textAlign: 'center',
+            padding: '40px',
+            color: '#6B7280',
+            fontFamily: 'Poppins',
+            fontSize: '13px',
+          }}>
+            <p>📁 No projects yet</p>
+            <p style={{ fontSize: '11px', marginTop: '8px' }}>Projects will appear here once they're uploaded to this department</p>
+          </div>
+        )}
+
         {/* Files Grid */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 220px)',
-          gap: '15px',
-        }}>
-          {files.map((file) => (
-            <RecentFileCard
-              key={file.id}
-              title={file.title}
-              onClick={() => console.log(`Clicked: ${file.title}`)}
-            />
-          ))}
-        </div>
+        {!loading && projects.length > 0 && (
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 220px)',
+            gap: '15px',
+          }}>
+            {projects.map((project) => (
+              <RecentFileCard
+                key={project._id}
+                title={project.title}
+                onClick={() => console.log(`Clicked: ${project.title}`)}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </main>
   );

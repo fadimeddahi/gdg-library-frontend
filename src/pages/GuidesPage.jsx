@@ -1,20 +1,69 @@
 import { Search, Plus } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { RecentFileCard } from '../components/resources/RecentFileCard';
+import guideService from '../services/guideService';
+import { departmentService } from '../services/departmentService';
 
 export const GuidesPage = () => {
   const { departmentId } = useParams();
   const navigate = useNavigate();
+  const [guides, setGuides] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [departmentData, setDepartmentData] = useState(null);
 
-  // Mock files data
-  const files = [
-    { id: 1, title: 'Brand Guidelines.pdf' },
-    { id: 2, title: 'Style Guide.pdf' },
-    { id: 3, title: 'Onboarding Guide.docx' },
-    { id: 4, title: 'Security Policy.pdf' },
-    { id: 5, title: 'Code of Conduct.pdf' },
-    { id: 6, title: 'Best Practices.docx' },
-  ];
+  // First, fetch the department to get its MongoDB ID
+  useEffect(() => {
+    const fetchDepartment = async () => {
+      try {
+        const dept = await departmentService.getDepartmentBySlug(departmentId);
+        console.log('📋 Department data for guides:', dept);
+        setDepartmentData(dept);
+      } catch (error) {
+        console.error('Failed to fetch department details:', error);
+      }
+    };
+
+    if (departmentId) {
+      fetchDepartment();
+    }
+  }, [departmentId]);
+
+  // Then fetch guides using the department's MongoDB ID
+  useEffect(() => {
+    const fetchGuides = async () => {
+      if (!departmentData?._id) {
+        console.log('⏳ Waiting for department data...');
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError(null);
+        console.log('🔍 Fetching guides for department ID:', departmentData._id);
+        
+        const result = await guideService.getGuidesByDepartment(departmentData._id, {
+          search: searchQuery,
+          page: page,
+          limit: 10,
+        });
+        
+        setGuides(result.guides);
+        console.log('✅ Guides loaded:', result.guides);
+      } catch (err) {
+        console.error('❌ Error fetching guides:', err);
+        setError(err.message || 'Failed to load guides');
+        setGuides([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGuides();
+  }, [departmentData, searchQuery, page]);
 
   return (
     <main className="flex-1 bg-white" style={{ padding: '22px 65px' }}>
@@ -66,6 +115,11 @@ export const GuidesPage = () => {
           <input
             type="text"
             placeholder="Search"
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setPage(1);
+            }}
             style={{
               width: '100%',
               height: '35px',
@@ -154,20 +208,58 @@ export const GuidesPage = () => {
           </button>
         </div>
 
+        {/* Loading State */}
+        {loading && (
+          <div style={{ textAlign: 'center', padding: '40px', color: '#6B7280' }}>
+            <p style={{ fontFamily: 'Poppins', fontSize: '13px' }}>Loading guides...</p>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && !loading && (
+          <div style={{
+            textAlign: 'center',
+            padding: '40px',
+            color: '#EF4444',
+            backgroundColor: '#FEE2E2',
+            borderRadius: '8px',
+            fontFamily: 'Poppins',
+            fontSize: '13px',
+          }}>
+            <p>❌ {error}</p>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!loading && !error && guides.length === 0 && (
+          <div style={{
+            textAlign: 'center',
+            padding: '40px',
+            color: '#6B7280',
+            fontFamily: 'Poppins',
+            fontSize: '13px',
+          }}>
+            <p>📁 No guides yet</p>
+            <p style={{ fontSize: '11px', marginTop: '8px' }}>Guides will appear here once they're uploaded to this department</p>
+          </div>
+        )}
+
         {/* Files Grid */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 220px)',
-          gap: '15px',
-        }}>
-          {files.map((file) => (
-            <RecentFileCard
-              key={file.id}
-              title={file.title}
-              onClick={() => console.log(`Clicked: ${file.title}`)}
-            />
-          ))}
-        </div>
+        {!loading && guides.length > 0 && (
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 220px)',
+            gap: '15px',
+          }}>
+            {guides.map((guide) => (
+              <RecentFileCard
+                key={guide._id}
+                title={guide.title}
+                onClick={() => console.log(`Clicked: ${guide.title}`)}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </main>
   );

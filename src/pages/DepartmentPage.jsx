@@ -1,10 +1,11 @@
-import { Search, Plus, MoreVertical, FileText, Calendar } from 'lucide-react';
+import { Plus, MoreVertical, FileText, Calendar } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export const DepartmentPage = ({ departmentId, departmentName }) => {
   const [openMenuId, setOpenMenuId] = useState(null);
   const navigate = useNavigate();
+
   // Mock descriptions for each department
   const descriptions = {
     'design': "The Design department is responsible for creating all visual identities, event materials, and branding assets for GDG Algiers. Our team works on designing posters, social media graphics, event banners, merchandise, and maintaining a consistent visual language across all our communications. We use industry-standard tools and follow modern design principles to ensure our community stands out.",
@@ -59,57 +60,6 @@ export const DepartmentPage = ({ departmentId, departmentName }) => {
         >
           {descriptions[departmentId] || "This department contributes to the success of GDG Algiers."}
         </p>
-      </div>
-
-      {/* Search and Filter Section */}
-      <div style={{ display: 'flex', gap: '108px', marginBottom: '29px', alignItems: 'center' }}>
-        {/* Search Input with Icon */}
-        <div style={{ flex: 1, position: 'relative' }}>
-          <Search 
-            size={16} 
-            style={{ 
-              position: 'absolute', 
-              left: '14px', 
-              top: '50%', 
-              transform: 'translateY(-50%)',
-              color: '#9CA3AF'
-            }} 
-          />
-          <input
-            type="text"
-            placeholder="Search resources..."
-            style={{
-              width: '100%',
-              fontFamily: 'Poppins',
-              fontSize: '11px',
-              padding: '9px 14px 9px 43px',
-              border: '1px solid #E5E7EB',
-              borderRadius: '7px',
-              outline: 'none',
-            }}
-          />
-        </div>
-        
-        {/* Filter Dropdown */}
-        <select
-          style={{
-            fontFamily: 'Poppins',
-            fontSize: '11px',
-            padding: '9px 14px',
-            border: '1px solid #E5E7EB',
-            borderRadius: '7px',
-            outline: 'none',
-            cursor: 'pointer',
-            minWidth: '135px',
-            flexShrink: 0,
-          }}
-        >
-          <option value="">All Types</option>
-          <option value="document">Documents</option>
-          <option value="image">Images</option>
-          <option value="video">Videos</option>
-          <option value="other">Other</option>
-        </select>
       </div>
 
       {/* Your Folders Section */}

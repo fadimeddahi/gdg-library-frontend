@@ -1,20 +1,69 @@
 import { Search, Plus } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { RecentFileCard } from '../components/resources/RecentFileCard';
+import templateService from '../services/templateService';
+import { departmentService } from '../services/departmentService';
 
 export const TemplatesPage = () => {
   const { departmentId } = useParams();
   const navigate = useNavigate();
+  const [templates, setTemplates] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [departmentData, setDepartmentData] = useState(null);
 
-  // Mock files data
-  const files = [
-    { id: 1, title: 'Email Template.docx' },
-    { id: 2, title: 'Presentation Template.pptx' },
-    { id: 3, title: 'Report Template.docx' },
-    { id: 4, title: 'Invoice Template.xlsx' },
-    { id: 5, title: 'Social Media Template.psd' },
-    { id: 6, title: 'Newsletter Template.html' },
-  ];
+  // First, fetch the department to get its MongoDB ID
+  useEffect(() => {
+    const fetchDepartment = async () => {
+      try {
+        const dept = await departmentService.getDepartmentBySlug(departmentId);
+        console.log('📋 Department data for templates:', dept);
+        setDepartmentData(dept);
+      } catch (error) {
+        console.error('Failed to fetch department details:', error);
+      }
+    };
+
+    if (departmentId) {
+      fetchDepartment();
+    }
+  }, [departmentId]);
+
+  // Then fetch templates using the department's MongoDB ID
+  useEffect(() => {
+    const fetchTemplates = async () => {
+      if (!departmentData?._id) {
+        console.log('⏳ Waiting for department data...');
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError(null);
+        console.log('🔍 Fetching templates for department ID:', departmentData._id);
+        
+        const result = await templateService.getTemplatesByDepartment(departmentData._id, {
+          search: searchQuery,
+          page: page,
+          limit: 10,
+        });
+        
+        setTemplates(result.templates);
+        console.log('✅ Templates loaded:', result.templates);
+      } catch (err) {
+        console.error('❌ Error fetching templates:', err);
+        setError(err.message || 'Failed to load templates');
+        setTemplates([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTemplates();
+  }, [departmentData, searchQuery, page]);
 
   return (
     <main className="flex-1 bg-white" style={{ padding: '22px 65px' }}>
@@ -66,6 +115,11 @@ export const TemplatesPage = () => {
           <input
             type="text"
             placeholder="Search"
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setPage(1);
+            }}
             style={{
               width: '100%',
               height: '35px',
@@ -154,20 +208,58 @@ export const TemplatesPage = () => {
           </button>
         </div>
 
+        {/* Loading State */}
+        {loading && (
+          <div style={{ textAlign: 'center', padding: '40px', color: '#6B7280' }}>
+            <p style={{ fontFamily: 'Poppins', fontSize: '13px' }}>Loading templates...</p>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && !loading && (
+          <div style={{
+            textAlign: 'center',
+            padding: '40px',
+            color: '#EF4444',
+            backgroundColor: '#FEE2E2',
+            borderRadius: '8px',
+            fontFamily: 'Poppins',
+            fontSize: '13px',
+          }}>
+            <p>❌ {error}</p>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!loading && !error && templates.length === 0 && (
+          <div style={{
+            textAlign: 'center',
+            padding: '40px',
+            color: '#6B7280',
+            fontFamily: 'Poppins',
+            fontSize: '13px',
+          }}>
+            <p>📁 No templates yet</p>
+            <p style={{ fontSize: '11px', marginTop: '8px' }}>Templates will appear here once they're uploaded to this department</p>
+          </div>
+        )}
+
         {/* Files Grid */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 220px)',
-          gap: '15px',
-        }}>
-          {files.map((file) => (
-            <RecentFileCard
-              key={file.id}
-              title={file.title}
-              onClick={() => console.log(`Clicked: ${file.title}`)}
-            />
-          ))}
-        </div>
+        {!loading && templates.length > 0 && (
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 220px)',
+            gap: '15px',
+          }}>
+            {templates.map((template) => (
+              <RecentFileCard
+                key={template._id}
+                title={template.title}
+                onClick={() => console.log(`Clicked: ${template.title}`)}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </main>
   );

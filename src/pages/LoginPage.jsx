@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import styles from '../styles/Auth.module.css';
-import { authService } from '../services/authService';
+import { useAuth } from '../context/useAuth';
 
 export const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -11,6 +11,7 @@ export const LoginPage = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,7 +19,7 @@ export const LoginPage = () => {
     setLoading(true);
 
     try {
-      await authService.login(email, password);
+      await login(email, password);
       // Redirect to home page on success
       navigate('/');
     } catch (err) {
