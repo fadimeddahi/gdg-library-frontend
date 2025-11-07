@@ -51,6 +51,18 @@ export const EventsPage = () => {
           limit: 10,
         });
         
+        console.log('📦 Full API response:', result);
+        console.log('📋 Events array:', result.events);
+        
+        if (result.events && result.events.length > 0) {
+          console.log('🔎 First event details:', {
+            id: result.events[0]._id,
+            title: result.events[0].title,
+            fileUrl: result.events[0].fileUrl,
+            hasFileUrl: !!result.events[0].fileUrl,
+          });
+        }
+        
         setEvents(result.events);
         console.log('✅ Events loaded:', result.events);
       } catch (err) {
@@ -254,8 +266,10 @@ export const EventsPage = () => {
             {events.map((event) => (
               <RecentFileCard
                 key={event._id}
+                id={event._id}
                 title={event.title}
-                onClick={() => console.log(`Clicked: ${event.title}`)}
+                fileUrl={event.fileUrl}
+                collection="events"
               />
             ))}
           </div>

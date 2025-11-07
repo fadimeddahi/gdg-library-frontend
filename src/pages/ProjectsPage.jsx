@@ -51,6 +51,18 @@ export const ProjectsPage = () => {
           limit: 10,
         });
         
+        console.log('📦 Full API response:', result);
+        console.log('📋 Projects array:', result.projects);
+        
+        if (result.projects && result.projects.length > 0) {
+          console.log('🔎 First project details:', {
+            id: result.projects[0]._id,
+            title: result.projects[0].title,
+            fileUrl: result.projects[0].fileUrl,
+            hasFileUrl: !!result.projects[0].fileUrl,
+          });
+        }
+        
         setProjects(result.projects);
         console.log('✅ Projects loaded:', result.projects);
       } catch (err) {
@@ -254,8 +266,10 @@ export const ProjectsPage = () => {
             {projects.map((project) => (
               <RecentFileCard
                 key={project._id}
+                id={project._id}
                 title={project.title}
-                onClick={() => console.log(`Clicked: ${project.title}`)}
+                fileUrl={project.fileUrl}
+                collection="projects"
               />
             ))}
           </div>

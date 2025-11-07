@@ -51,6 +51,18 @@ export const TemplatesPage = () => {
           limit: 10,
         });
         
+        console.log('📦 Full API response:', result);
+        console.log('📋 Templates array:', result.templates);
+        
+        if (result.templates && result.templates.length > 0) {
+          console.log('🔎 First template details:', {
+            id: result.templates[0]._id,
+            title: result.templates[0].title,
+            fileUrl: result.templates[0].fileUrl,
+            hasFileUrl: !!result.templates[0].fileUrl,
+          });
+        }
+        
         setTemplates(result.templates);
         console.log('✅ Templates loaded:', result.templates);
       } catch (err) {
@@ -254,8 +266,10 @@ export const TemplatesPage = () => {
             {templates.map((template) => (
               <RecentFileCard
                 key={template._id}
+                id={template._id}
                 title={template.title}
-                onClick={() => console.log(`Clicked: ${template.title}`)}
+                fileUrl={template.fileUrl}
+                collection="templates"
               />
             ))}
           </div>

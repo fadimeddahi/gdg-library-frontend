@@ -51,6 +51,18 @@ export const GuidesPage = () => {
           limit: 10,
         });
         
+        console.log('📦 Full API response:', result);
+        console.log('📋 Guides array:', result.guides);
+        
+        if (result.guides && result.guides.length > 0) {
+          console.log('🔎 First guide details:', {
+            id: result.guides[0]._id,
+            title: result.guides[0].title,
+            fileUrl: result.guides[0].fileUrl,
+            hasFileUrl: !!result.guides[0].fileUrl,
+          });
+        }
+        
         setGuides(result.guides);
         console.log('✅ Guides loaded:', result.guides);
       } catch (err) {
@@ -254,8 +266,10 @@ export const GuidesPage = () => {
             {guides.map((guide) => (
               <RecentFileCard
                 key={guide._id}
+                id={guide._id}
                 title={guide.title}
-                onClick={() => console.log(`Clicked: ${guide.title}`)}
+                fileUrl={guide.fileUrl}
+                collection="guides"
               />
             ))}
           </div>
