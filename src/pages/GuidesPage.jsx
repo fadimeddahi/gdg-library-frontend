@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { RecentFileCard } from '../components/resources/RecentFileCard';
 import guideService from '../services/guideService';
 import { departmentService } from '../services/departmentService';
+import { FileUploadModal } from '../components/common/FileUploadModal';
 
 export const GuidesPage = () => {
   const { departmentId } = useParams();
@@ -14,6 +15,7 @@ export const GuidesPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
   const [departmentData, setDepartmentData] = useState(null);
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
 
   // First, fetch the department to get its MongoDB ID
   useEffect(() => {
@@ -200,6 +202,7 @@ export const GuidesPage = () => {
             Your Files
           </h2>
           <button
+            onClick={() => setUploadModalOpen(true)}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -275,6 +278,15 @@ export const GuidesPage = () => {
           </div>
         )}
       </div>
+
+      {/* File Upload Modal */}
+      <FileUploadModal
+        isOpen={uploadModalOpen}
+        onClose={() => setUploadModalOpen(false)}
+        collection="guides"
+        departmentObjectId={departmentData?._id}
+        departmentName={departmentData?.name}
+      />
     </main>
   );
 };

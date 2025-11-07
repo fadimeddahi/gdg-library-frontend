@@ -1,11 +1,12 @@
 import { Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import './App.css'
 import { Sidebar } from './components/layout/Sidebar'
 import { Header } from './components/layout/Header'
 import { LibraryHeader } from './components/layout/LibraryHeader'
 import { FolderItem } from './components/resources/FolderItem'
 import { DepartmentPage } from './pages/DepartmentPage';
+import { LibraryPage } from './pages/LibraryPage';
 import { ProjectsPage } from './pages/ProjectsPage';
 import { EventsPage } from './pages/EventsPage';
 import { TemplatesPage } from './pages/TemplatesPage';
@@ -13,35 +14,108 @@ import { GuidesPage } from './pages/GuidesPage';
 import { SignUpPage } from './pages/SignUpPage';
 import { LoginPage } from './pages/LoginPage';
 import { departmentService } from './services/departmentService';
+import { savedFolderService } from './services/savedFolderService';
 
 function HomePage() {
-  const folders = [
-    { id: 1, name: 'Design Assets', color: 'blue' },
-    { id: 2, name: 'Event Fiches', color: 'yellow' },
-    { id: 3, name: 'Templates', color: 'green' },
-    { id: 4, name: 'Guidelines', color: 'red' },
-    { id: 5, name: 'Resources', color: 'blue' },
-  ];
+  const [savedFolders, setSavedFolders] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchSavedFolders();
+  }, []);
+
+  const fetchSavedFolders = async () => {
+    try {
+      console.log('📚 HomePage: Fetching saved folders...');
+      const folders = await savedFolderService.getAllSavedFolders();
+      setSavedFolders(folders);
+      console.log('✅ HomePage: Loaded', folders.length, 'saved folders');
+    } catch (error) {
+      console.error('❌ HomePage Error fetching saved folders:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getColorFromFolderType = (folderType) => {
+    const colorMap = {
+      'projects': 'blue',
+      'events': 'red',
+      'templates': 'green',
+      'guides': 'yellow',
+    };
+    return colorMap[folderType] || 'blue';
+  };
+
+  const handleFolderClick = (folder) => {
+    window.location.href = `/department/${folder.departmentSlug}/${folder.folderType}`;
+  };
 
   return (
     <div className="flex-1 overflow-auto">
       <Header />
       <div style={{ padding: '0 26px' }}>
         <LibraryHeader />
-        <div 
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 180px)',
-            gap: '28px',
-            marginTop: '28px',
-          }}
-        >
-          {folders.map((folder) => (
-            <FolderItem
-              key={folder.id}
-              folder={folder}
-            />
-          ))}
+        
+        {/* My Library Section */}
+        <div style={{ marginTop: '28px' }}>
+          <h2 style={{
+            fontFamily: 'Poppins',
+            fontWeight: 600,
+            fontSize: '16px',
+            color: '#000000',
+            marginBottom: '20px',
+          }}>
+            📚 My Library
+          </h2>
+
+          {loading ? (
+            <div style={{
+              padding: '20px',
+              fontFamily: 'Poppins',
+              fontSize: '14px',
+              color: '#6B7280',
+            }}>
+              ⏳ Loading your library...
+            </div>
+          ) : savedFolders.length === 0 ? (
+            <div style={{
+              padding: '40px 20px',
+              backgroundColor: '#F9FAFB',
+              borderRadius: '12px',
+              border: '2px dashed #D1D5DB',
+              textAlign: 'center',
+            }}>
+              <p style={{
+                fontFamily: 'Poppins',
+                fontWeight: 400,
+                fontSize: '14px',
+                color: '#6B7280',
+              }}>
+                No saved folders yet. Go to a department and click "Add to Your Library" to get started!
+              </p>
+            </div>
+          ) : (
+            <div 
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+                gap: '28px',
+                marginBottom: '40px',
+              }}
+            >
+              {savedFolders.map(folder => (
+                <FolderItem
+                  key={folder._id}
+                  name={`${folder.departmentName} ${folder.folderName}`}
+                  department={folder.departmentName}
+                  folderType={folder.folderName}
+                  color={getColorFromFolderType(folder.folderType)}
+                  onClick={() => handleFolderClick(folder)}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -80,7 +154,13 @@ function DepartmentPageWrapper() {
     return <div style={{ padding: '24px', fontFamily: 'Poppins' }}>Department not found</div>;
   }
 
-  return <DepartmentPage departmentId={department.slug} departmentName={department.name} />;
+  return (
+    <DepartmentPage 
+      departmentId={department.slug} 
+      departmentName={department.name}
+      departmentObjectId={department._id}
+    />
+  );
 }
 
 // Layout wrapper to show/hide sidebar

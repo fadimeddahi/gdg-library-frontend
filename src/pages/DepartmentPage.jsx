@@ -1,10 +1,110 @@
 import { Plus, MoreVertical, FileText, Calendar } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { savedFolderService } from '../services/savedFolderService';
+import { useAuthorization } from '../hooks/useAuthorization';
+import { AuthRequiredModal } from '../components/common/AuthRequiredModal';
 
-export const DepartmentPage = ({ departmentId, departmentName }) => {
+export const DepartmentPage = ({ departmentId, departmentName, departmentObjectId }) => {
   const [openMenuId, setOpenMenuId] = useState(null);
+  const [_savedFolders, setSavedFolders] = useState(new Set());
   const navigate = useNavigate();
+  const { checkAuthorization, authModal, closeAuthModal } = useAuthorization();
+
+  // Fetch saved folders on mount
+  const checkSavedFolders = useCallback(async () => {
+    try {
+      console.log('🔍 Checking saved folders for', departmentId);
+      const response = await savedFolderService.getAllSavedFolders();
+      
+      // Create a Set of saved folderTypes for this department
+      const saved = new Set(
+        response
+          .filter(f => f.departmentSlug === departmentId)
+          .map(f => f.folderType)
+      );
+      
+      setSavedFolders(saved);
+      console.log('✅ Saved folders checked:', Array.from(saved));
+    } catch (error) {
+      console.error('❌ Error checking saved folders:', error);
+    }
+  }, [departmentId]);
+
+  useEffect(() => {
+    checkSavedFolders();
+  }, [checkSavedFolders]);
+
+  const getFolderTypeFromName = (folderName) => {
+    const typeMap = {
+      'Projects': 'projects',
+      'Events': 'events',
+      'Templates': 'templates',
+      'Guides': 'guides',
+    };
+    return typeMap[folderName] || folderName.toLowerCase();
+  };
+
+  const handleSaveFolder = async (folder) => {
+    // Check authorization - just needs to be authenticated
+    if (!checkAuthorization('visitor', 'save folders to your library')) {
+      return;
+    }
+
+    try {
+      console.log('💾 Saving folder:', folder, 'for department:', departmentId);
+      console.log('📊 Department Object ID:', departmentObjectId);
+
+      // Get folder type from name
+      const folderType = getFolderTypeFromName(folder);
+
+      // Prepare folder data
+      const folderData = {
+        department: departmentObjectId,
+        folderType: folderType,
+        folderName: folder,
+        departmentName: departmentName,
+        departmentSlug: departmentId,
+        color: getFolderColor(folder),
+      };
+
+      console.log('🎯 Folder data to send:', folderData);
+
+      // Save to backend
+      const result = await savedFolderService.saveFolder(folderData);
+      console.log('🎉 Save result:', result);
+
+      // Refresh saved folders list
+      await checkSavedFolders();
+      
+      setOpenMenuId(null);
+      
+      console.log('✅ Folder saved successfully');
+      alert(`✅ "${folder}" saved to your library!`);
+    } catch (error) {
+      console.error('❌ Error saving folder:', error);
+      console.error('📋 Full error object:', error);
+      
+      // Check if it's already saved
+      if (error.message.includes('already in your library')) {
+        alert('This folder is already in your library');
+      } else if (error.message.includes('Server error')) {
+        alert(`Server error: ${error.message}`);
+      } else {
+        alert(`Failed to save folder: ${error.message}`);
+      }
+    }
+  };
+
+  const getFolderColor = (folderName) => {
+    const colorMap = {
+      'Projects': 'blue',
+      'Events': 'red',
+      'Templates': 'green',
+      'Guides': 'yellow',
+    };
+    return colorMap[folderName] || 'blue';
+  };
 
   // Mock descriptions for each department
   const descriptions = {
@@ -314,8 +414,7 @@ export const DepartmentPage = ({ departmentId, departmentName }) => {
                         }}
                         onClick={(e) => {
                           e.stopPropagation();
-                          console.log('Add to Library', folder);
-                          setOpenMenuId(null);
+                          handleSaveFolder(folder);
                         }}
                       >
                         Add to Your Library
@@ -328,6 +427,15 @@ export const DepartmentPage = ({ departmentId, departmentName }) => {
           );
         })}
       </div>
+
+      {/* Auth Required Modal */}
+      <AuthRequiredModal 
+        isOpen={authModal.isOpen}
+        onClose={closeAuthModal}
+        requiredRole={authModal.requiredRole}
+        actionName={authModal.actionName}
+        onAuthSuccess={checkSavedFolders}
+      />
     </main>
   );
 };
