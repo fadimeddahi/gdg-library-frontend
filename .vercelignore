@@ -1,7 +1,11 @@
 .git
 .gitignore
 README.md
-node_modules
-npm-debug.log
+dist
+build
+coverage
 .env.local
 .DS_Store
+*.log
+.next
+
