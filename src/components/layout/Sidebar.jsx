@@ -21,18 +21,12 @@ export const Sidebar = () => {
       try {
         const data = await departmentService.getAllDepartments();
         
-        console.log('🔍 Raw department data from backend:', data);
-        console.log('🔍 Slugs:', data.map(d => d.slug));
-        
-        // Sort departments in the correct order
         const orderedSlugs = ['design', 'dev', 'comm', 'hr', 'logistics', 'multimedia', 'external'];
         const sortedDepartments = data.sort((a, b) => {
           const indexA = orderedSlugs.indexOf(a.slug);
           const indexB = orderedSlugs.indexOf(b.slug);
           return indexA - indexB;
         });
-        
-        console.log('✅ Sorted departments:', sortedDepartments.map(d => ({ slug: d.slug, name: d.name })));
         
         setDepartments(sortedDepartments);
       } catch (error) {
@@ -65,7 +59,6 @@ export const Sidebar = () => {
   };
 
   const getDepartmentIcon = (slug, isActive) => {
-    console.log(`🎨 Getting icon for slug: "${slug}"`);
     const iconProps = { size: 16, color: isActive ? '#000000' : '#676C72' };
     switch(slug) {
       case 'design': return <Palette {...iconProps} />;
@@ -76,7 +69,6 @@ export const Sidebar = () => {
       case 'multimedia': return <Video {...iconProps} />;
       case 'external': return <Handshake {...iconProps} />;
       default: 
-        console.warn(`⚠️ No icon found for slug: "${slug}"`);
         return null;
     }
   };

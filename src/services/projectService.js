@@ -118,10 +118,9 @@ export const createProject = async (projectData) => {
       throw new Error(result.message || 'Failed to create project');
     }
 
-    console.log('✅ Project created:', result.data);
     return result.data;
   } catch (error) {
-    console.error('❌ Project creation error:', error);
+    console.error('Project creation error:', error);
     throw error;
   }
 };

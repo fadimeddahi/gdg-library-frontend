@@ -26,7 +26,6 @@ export const LibraryPage = () => {
       setSavedFolders(folders);
       console.log('✅ LibraryPage: Loaded', folders.length, 'saved folders');
     } catch (err) {
-      console.error('❌ LibraryPage Error:', err);
       setError(err.message || 'Failed to load library');
       alert('Error loading your library. Please try again.');
     } finally {
@@ -40,20 +39,16 @@ export const LibraryPage = () => {
     }
 
     try {
-      console.log('🗑️ Removing folder:', folderId);
       await savedFolderService.removeFolder(folderId);
       
-      // Remove from UI
       setSavedFolders(savedFolders.filter(f => f._id !== folderId));
-      console.log('✅ Folder removed successfully');
     } catch (err) {
-      console.error('❌ Error removing folder:', err);
+      console.error('Error removing folder:', err);
       alert('Failed to remove folder. Please try again.');
     }
   };
 
   const handleOpenFolder = (folder) => {
-    console.log('📂 Opening folder:', folder.folderType, 'from', folder.departmentSlug);
     navigate(`/department/${folder.departmentSlug}/${folder.folderType}`);
   };
 

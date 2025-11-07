@@ -100,8 +100,6 @@ export const DepartmentPage = ({ departmentId, departmentName, departmentObjectI
     'external': "The External Relations department manages partnerships, sponsorships, and community outreach initiatives for GDG Algiers. We build relationships with companies, universities, and other tech communities, negotiate sponsorship deals, and create collaboration opportunities. Our work ensures GDG Algiers has the resources and network to deliver exceptional experiences to our members."
   };
 
-  console.log('Department ID:', departmentId, 'Department Name:', departmentName);
-
   return (
     <main className="flex-1 bg-white" style={{ padding: '22px 65px' }}>
       {/* SVG Gradient Definitions */}
