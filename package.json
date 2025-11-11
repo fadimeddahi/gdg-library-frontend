@@ -13,7 +13,7 @@
 },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
+    "clsx": "^2.1.1",    
     "lucide-react": "^0.552.0",
     "postinstall-postinstall": "^2.1.0",
     "react": "^19.1.1",
@@ -24,7 +24,13 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "4.43.0"
+    "@rollup/rollup-linux-x64-gnu": "4.53.2",
+    "@rollup/rollup-linux-x64-musl": "4.53.2",
+    "@rollup/rollup-darwin-x64": "4.53.2",
+    "@rollup/rollup-darwin-arm64": "4.53.2",
+    "@rollup/rollup-win32-x64": "4.53.2",
+    "@rollup/rollup-linux-arm64-gnu": "4.53.2",
+    "@rollup/rollup-linux-arm64-musl": "4.53.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
