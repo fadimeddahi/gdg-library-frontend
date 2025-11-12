@@ -30,10 +30,12 @@ export const LandingPage = () => {
     }
   };
 
-  const filteredDepartments = departments.filter(dept =>
-    dept.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    dept.description.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredDepartments = departments.filter(dept => {
+    const name = dept.name?.toLowerCase() || '';
+    const description = dept.description?.toLowerCase() || '';
+    const query = searchQuery.toLowerCase();
+    return name.includes(query) || description.includes(query);
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100">
