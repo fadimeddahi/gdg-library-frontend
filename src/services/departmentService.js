@@ -18,10 +18,12 @@ export const departmentService = {
    */
   getAllDepartments: async () => {
     try {
+      const token = getAuthToken();
       const response = await fetch(`${API_BASE_URL}/departments`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` }),
         },
       });
 
