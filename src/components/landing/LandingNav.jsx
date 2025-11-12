@@ -4,13 +4,15 @@ export const LandingNav = () => {
   const navigate = useNavigate();
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
+    <nav className="sticky top-0 z-50 bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">GDG</span>
-            </div>
+          <div className="flex items-center gap-3">
+            <img 
+              src="/GDG.png" 
+              alt="GDG Logo" 
+              style={{ height: '40px' }}
+            />
             <h1 className="text-2xl font-bold text-slate-900">Resource Hub</h1>
           </div>
           <div className="flex gap-4">
@@ -22,7 +24,8 @@ export const LandingNav = () => {
             </button>
             <button
               onClick={() => navigate('/signup')}
-              className="px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:shadow-lg transition font-medium"
+              className="px-6 py-2 text-white rounded-lg hover:shadow-lg transition font-medium"
+              style={{ backgroundColor: '#4285F4' }}
             >
               Sign Up
             </button>

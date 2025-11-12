@@ -12,7 +12,10 @@ export const SearchSection = ({ searchQuery, onSearchChange }) => {
               placeholder="Search departments..."
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="w-full pl-12 pr-6 py-4 bg-white border-2 border-slate-200 rounded-xl text-lg focus:outline-none focus:border-blue-500 transition"
+              className="w-full pl-12 pr-6 py-4 bg-white border-2 border-slate-200 rounded-xl text-lg focus:outline-none transition"
+              style={{ focusBorderColor: '#4285F4' }}
+              onFocus={(e) => e.target.style.borderColor = '#4285F4'}
+              onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
             />
           </div>
         </div>

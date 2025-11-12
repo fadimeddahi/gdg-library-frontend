@@ -35,19 +35,41 @@ export const FeaturesSection = () => {
   ];
 
   return (
-    <section className="py-20 bg-white/50">
+    <section className="py-28 bg-gradient-to-b from-white to-blue-50/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h3 className="text-4xl font-bold text-slate-900 mb-4">Why Choose GDG Resource Hub?</h3>
-          <p className="text-xl text-slate-600">Everything you need to stay organized and connected</p>
+        {/* Section Header */}
+        <div className="text-center mb-20">
+          <h3 className="text-5xl md:text-6xl font-bold text-slate-900 mb-6 tracking-tight">
+            Why Choose GDG<br />Resource Hub?
+          </h3>
+          <p className="text-xl text-slate-600 font-light max-w-2xl mx-auto">
+            Everything you need to stay organized, connected, and productive with your GDG community
+          </p>
         </div>
 
+        {/* Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {features.map((feature, idx) => (
-            <div key={idx} className="p-6 bg-white rounded-xl border border-slate-200 hover:border-blue-300 hover:shadow-lg transition">
-              <feature.icon className="w-12 h-12 text-blue-500 mb-4" />
-              <h4 className="text-xl font-semibold text-slate-900 mb-2">{feature.title}</h4>
-              <p className="text-slate-600">{feature.description}</p>
+            <div 
+              key={idx} 
+              className="group relative p-8 bg-white rounded-2xl border-2 border-slate-100 hover:border-blue-200 transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+            >
+              {/* Glow effect on hover */}
+              <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity duration-300 blur-xl" style={{ backgroundColor: '#4285F4' }}></div>
+              
+              {/* Content */}
+              <div className="relative space-y-4">
+                {/* Icon */}
+                <div className="inline-flex p-3 rounded-xl bg-blue-50 group-hover:bg-blue-100 transition-colors">
+                  <feature.icon className="w-6 h-6" style={{ color: '#4285F4', strokeWidth: 1.5 }} />
+                </div>
+                
+                {/* Title */}
+                <h4 className="text-2xl font-bold text-slate-900">{feature.title}</h4>
+                
+                {/* Description */}
+                <p className="text-slate-600 leading-relaxed font-light">{feature.description}</p>
+              </div>
             </div>
           ))}
         </div>
