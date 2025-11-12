@@ -17,6 +17,29 @@ import { SignUpPage } from './pages/SignUpPage';
 import { LoginPage } from './pages/LoginPage';
 import { departmentService } from './services/departmentService';
 import { savedFolderService } from './services/savedFolderService';
+import { useAuth } from './context/useAuth';
+
+// Protected Route Component - redirects to login if not authenticated
+function ProtectedRoute({ element }) {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2" style={{ borderColor: '#4285F4' }}></div>
+          <p className="mt-4 text-slate-600 font-medium">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return element;
+}
 
 function HomePage() {
   const [savedFolders, setSavedFolders] = useState([]);
@@ -32,6 +55,8 @@ function HomePage() {
       setSavedFolders(folders);
     } catch (error) {
       console.error('Error fetching saved folders:', error);
+      // Don't show toast error, just set empty state
+      setSavedFolders([]);
     } finally {
       setLoading(false);
     }
@@ -174,18 +199,18 @@ function MainLayout() {
     <div className={isAuthPage || isLandingPage ? 'min-h-screen' : 'flex h-screen'}>
       {showSidebar && <Sidebar />}
       <Routes>
-        {/* Landing & Auth Routes */}
+        {/* Landing & Auth Routes - Public */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/login" element={<LoginPage />} />
 
-        {/* Main Routes */}
-        <Route path="/home" element={<HomePage />} />
-        <Route path="/department/:departmentId" element={<DepartmentPageWrapper />} />
-        <Route path="/department/:departmentId/projects" element={<ProjectsPage />} />
-        <Route path="/department/:departmentId/events" element={<EventsPage />} />
-        <Route path="/department/:departmentId/templates" element={<TemplatesPage />} />
-        <Route path="/department/:departmentId/guides" element={<GuidesPage />} />
+        {/* Protected Routes - Requires Authentication */}
+        <Route path="/home" element={<ProtectedRoute element={<HomePage />} />} />
+        <Route path="/department/:departmentId" element={<ProtectedRoute element={<DepartmentPageWrapper />} />} />
+        <Route path="/department/:departmentId/projects" element={<ProtectedRoute element={<ProjectsPage />} />} />
+        <Route path="/department/:departmentId/events" element={<ProtectedRoute element={<EventsPage />} />} />
+        <Route path="/department/:departmentId/templates" element={<ProtectedRoute element={<TemplatesPage />} />} />
+        <Route path="/department/:departmentId/guides" element={<ProtectedRoute element={<GuidesPage />} />} />
         
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
