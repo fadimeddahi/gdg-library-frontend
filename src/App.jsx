@@ -6,6 +6,7 @@ import { Sidebar } from './components/layout/Sidebar'
 import { Header } from './components/layout/Header'
 import { LibraryHeader } from './components/layout/LibraryHeader'
 import { FolderItem } from './components/resources/FolderItem'
+import { LandingPage } from './pages/LandingPage';
 import { DepartmentPage } from './pages/DepartmentPage';
 import { LibraryPage } from './pages/LibraryPage';
 import { ProjectsPage } from './pages/ProjectsPage';
@@ -165,18 +166,21 @@ function DepartmentPageWrapper() {
 // Layout wrapper to show/hide sidebar
 function MainLayout() {
   const location = useLocation();
-  const showSidebar = location.pathname !== '/login' && location.pathname !== '/signup';
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
+  const isLandingPage = location.pathname === '/';
+  const showSidebar = !isAuthPage && !isLandingPage;
 
   return (
-    <div className="flex h-screen">
+    <div className={isAuthPage || isLandingPage ? 'min-h-screen' : 'flex h-screen'}>
       {showSidebar && <Sidebar />}
       <Routes>
-        {/* Auth Routes */}
+        {/* Landing & Auth Routes */}
+        <Route path="/" element={<LandingPage />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/login" element={<LoginPage />} />
 
         {/* Main Routes */}
-        <Route path="/" element={<HomePage />} />
+        <Route path="/home" element={<HomePage />} />
         <Route path="/department/:departmentId" element={<DepartmentPageWrapper />} />
         <Route path="/department/:departmentId/projects" element={<ProjectsPage />} />
         <Route path="/department/:departmentId/events" element={<EventsPage />} />
