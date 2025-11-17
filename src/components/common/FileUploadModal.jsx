@@ -108,7 +108,6 @@ export const FileUploadModal = ({ isOpen, onClose, collection, departmentObjectI
         throw new Error(data.message || 'Upload failed');
       }
 
-      console.log('✅ Upload successful:', data);
       alert(`✅ "${title}" uploaded successfully!`);
       
       // Reset form
@@ -119,7 +118,7 @@ export const FileUploadModal = ({ isOpen, onClose, collection, departmentObjectI
       // Reload page to show new file
       window.location.reload();
     } catch (err) {
-      console.error('❌ Upload failed:', err);
+      console.error('Upload failed:', err);
       setError(err.message || 'Upload failed. Please try again.');
     } finally {
       setLoading(false);

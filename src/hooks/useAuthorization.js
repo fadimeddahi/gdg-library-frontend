@@ -22,14 +22,8 @@ export const useAuthorization = () => {
    * @returns {boolean} True if authorized, false otherwise
    */
   const checkAuthorization = (requiredRole = 'member', actionName = 'perform this action') => {
-    console.log('🔐 Checking authorization...');
-    console.log('   Current user:', user);
-    console.log('   Required role:', requiredRole);
-    console.log('   Is authenticated:', isAuthenticated);
-
     // If not authenticated, show login modal
     if (!isAuthenticated || !user) {
-      console.log('❌ User not authenticated');
       setAuthModal({
         isOpen: true,
         requiredRole: requiredRole,
@@ -40,14 +34,11 @@ export const useAuthorization = () => {
 
     // Get user's role
     const userRole = user.role || 'visitor';
-    console.log('   User role:', userRole);
 
     // Check if user has required role/permission
     const hasPermission = canPerformAction(userRole, requiredRole);
-    console.log('   Has permission:', hasPermission);
 
     if (!hasPermission) {
-      console.log('❌ User does not have required role:', requiredRole);
       setAuthModal({
         isOpen: true,
         requiredRole: requiredRole,
@@ -56,7 +47,6 @@ export const useAuthorization = () => {
       return false;
     }
 
-    console.log('✅ User authorized');
     return true;
   };
 

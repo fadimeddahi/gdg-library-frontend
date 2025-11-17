@@ -20,11 +20,9 @@ export const LibraryPage = () => {
     try {
       setLoading(true);
       setError(null);
-      console.log('📚 LibraryPage: Fetching saved folders...');
       
       const folders = await savedFolderService.getAllSavedFolders();
       setSavedFolders(folders);
-      console.log('✅ LibraryPage: Loaded', folders.length, 'saved folders');
     } catch (err) {
       setError(err.message || 'Failed to load library');
       alert('Error loading your library. Please try again.');
