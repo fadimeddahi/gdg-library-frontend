@@ -49,7 +49,6 @@ export const departmentService = {
   getDepartmentBySlug: async (slug) => {
     try {
       const token = getAuthToken();
-      console.log('🔐 Token in localStorage:', token ? '✅ Found' : '❌ Not found');
       
       const response = await fetch(`${API_BASE_URL}/departments/${slug}`, {
         method: 'GET',
@@ -60,13 +59,10 @@ export const departmentService = {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error('❌ Department fetch error:', errorData);
         throw new Error(`HTTP ${response.status}: Failed to fetch department`);
       }
 
       const result = await response.json();
-      console.log('✅ Department fetched:', result.data);
       return result.data || null;
     } catch (error) {
       console.error('Error fetching department:', error);
