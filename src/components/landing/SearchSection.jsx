@@ -10,11 +10,11 @@ import { Search } from 'lucide-react';
  */
 export const SearchSection = ({ searchQuery, onSearchChange }) => {
   return (
-    <section className="py-16">
+    <section className="py-16" aria-label="Department search">
       <div className="max-w-4xl mx-auto px-4">
         <div className="relative">
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" aria-hidden="true" />
             <input
               type="text"
               placeholder="Search departments..."
@@ -24,6 +24,7 @@ export const SearchSection = ({ searchQuery, onSearchChange }) => {
               style={{ focusBorderColor: '#4285F4' }}
               onFocus={(e) => e.target.style.borderColor = '#4285F4'}
               onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
+              aria-label="Search for departments by name or description"
             />
           </div>
         </div>

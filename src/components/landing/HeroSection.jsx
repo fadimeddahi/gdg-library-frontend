@@ -57,15 +57,17 @@ export const HeroSection = () => {
                 onClick={() => navigate('/signup')}
                 className="flex items-center justify-center gap-3 px-8 py-4 text-white rounded-xl font-semibold shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105"
                 style={{ backgroundColor: '#4285F4' }}
+                aria-label="Sign up to get started"
               >
-                Get Started <ArrowRight className="w-5 h-5" />
+                Get Started <ArrowRight className="w-5 h-5" aria-hidden="true" />
               </button>
               <button
                 onClick={handleExplore}
                 className="flex items-center justify-center gap-3 px-8 py-4 border-2 text-slate-700 rounded-xl font-semibold transition-all duration-300 hover:bg-slate-50 hover:border-slate-400"
                 style={{ borderColor: '#4285F4', color: '#4285F4' }}
+                aria-label="Scroll to explore departments"
               >
-                <Folder className="w-5 h-5" />
+                <Folder className="w-5 h-5" aria-hidden="true" />
                 Explore Departments
               </button>
             </div>
