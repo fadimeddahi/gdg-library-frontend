@@ -9,7 +9,6 @@ export const savedFolderService = {
     try {
       const token = localStorage.getItem('token');
       
-      console.log('📚 Fetching all saved folders...');
       const response = await fetch(`${API_BASE_URL}/saved-folders`, {
         method: 'GET',
         headers: {
@@ -24,10 +23,9 @@ export const savedFolderService = {
         throw new Error(data.message || 'Failed to fetch saved folders');
       }
 
-      console.log('✅ Saved folders fetched:', data.data);
       return data.data;
     } catch (error) {
-      console.error('❌ Error fetching saved folders:', error);
+      console.error('Error fetching saved folders:', error);
       throw error;
     }
   },
@@ -41,7 +39,6 @@ export const savedFolderService = {
     try {
       const token = localStorage.getItem('token');
       
-      console.log('💾 Saving folder:', folderData);
       const response = await fetch(`${API_BASE_URL}/saved-folders`, {
         method: 'POST',
         headers: {
@@ -51,9 +48,7 @@ export const savedFolderService = {
         body: JSON.stringify(folderData),
       });
 
-      console.log('📡 Response status:', response.status);
       const data = await response.json();
-      console.log('📡 Response data:', data);
       
       if (!response.ok) {
         throw new Error(data.message || `Server error: ${response.status}`);
@@ -63,10 +58,9 @@ export const savedFolderService = {
         throw new Error(data.message || 'Failed to save folder');
       }
 
-      console.log('✅ Folder saved successfully:', data.data);
       return data.data;
     } catch (error) {
-      console.error('❌ Error saving folder:', error);
+      console.error('Error saving folder:', error);
       throw error;
     }
   },
@@ -80,7 +74,6 @@ export const savedFolderService = {
     try {
       const token = localStorage.getItem('token');
       
-      console.log('🗑️ Removing folder:', folderId);
       const response = await fetch(`${API_BASE_URL}/saved-folders/${folderId}`, {
         method: 'DELETE',
         headers: {
@@ -95,10 +88,9 @@ export const savedFolderService = {
         throw new Error(data.message || 'Failed to remove folder');
       }
 
-      console.log('✅ Folder removed successfully');
       return data;
     } catch (error) {
-      console.error('❌ Error removing folder:', error);
+      console.error('Error removing folder:', error);
       throw error;
     }
   },
@@ -113,7 +105,6 @@ export const savedFolderService = {
     try {
       const token = localStorage.getItem('token');
       
-      console.log('🔍 Checking if saved:', { departmentId, folderType });
       const queryParams = new URLSearchParams({
         department: departmentId,
         folderType: folderType,
@@ -136,10 +127,9 @@ export const savedFolderService = {
         throw new Error(data.message || 'Failed to check save status');
       }
 
-      console.log('✅ Save status checked:', data.isSaved);
       return data;
     } catch (error) {
-      console.error('❌ Error checking save status:', error);
+      console.error('Error checking save status:', error);
       throw error;
     }
   },
@@ -153,7 +143,6 @@ export const savedFolderService = {
     try {
       const token = localStorage.getItem('token');
       
-      console.log('📊 Updating folder count:', folderId);
       const response = await fetch(`${API_BASE_URL}/saved-folders/${folderId}/count`, {
         method: 'PATCH',
         headers: {
@@ -168,10 +157,9 @@ export const savedFolderService = {
         throw new Error(data.message || 'Failed to update folder count');
       }
 
-      console.log('✅ Folder count updated:', data.data.itemCount);
       return data.data;
     } catch (error) {
-      console.error('❌ Error updating folder count:', error);
+      console.error('Error updating folder count:', error);
       throw error;
     }
   },

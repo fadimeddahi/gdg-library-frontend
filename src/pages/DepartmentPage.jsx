@@ -369,7 +369,7 @@ export const DepartmentPage = ({ departmentId, departmentName, departmentObjectI
                         }}
                         onClick={(e) => {
                           e.stopPropagation();
-                          console.log('Rename', folder);
+                          // TODO: Implement rename functionality
                           setOpenMenuId(null);
                         }}
                       >
