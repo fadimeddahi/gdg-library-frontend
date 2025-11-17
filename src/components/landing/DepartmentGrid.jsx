@@ -1,6 +1,14 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Folder } from 'lucide-react';
 
+/**
+ * Department Grid Component
+ * Displays a responsive grid of department cards with search functionality
+ * 
+ * @param {Object} props
+ * @param {Array} props.departments - Array of department objects to display
+ * @param {boolean} props.loading - Loading state indicator
+ */
 export const DepartmentGrid = ({ departments, loading }) => {
   const navigate = useNavigate();
 

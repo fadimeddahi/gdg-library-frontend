@@ -1,5 +1,13 @@
 import { Search } from 'lucide-react';
 
+/**
+ * Search Section Component
+ * Provides a search input for filtering departments
+ * 
+ * @param {Object} props
+ * @param {string} props.searchQuery - Current search query value
+ * @param {Function} props.onSearchChange - Callback function when search input changes
+ */
 export const SearchSection = ({ searchQuery, onSearchChange }) => {
   return (
     <section className="py-16">

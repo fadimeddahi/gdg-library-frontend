@@ -1,6 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Folder } from 'lucide-react';
 
+/**
+ * Hero Section Component
+ * Landing page hero with headline, CTA buttons, and visual showcase
+ */
 export const HeroSection = () => {
   const navigate = useNavigate();
 
