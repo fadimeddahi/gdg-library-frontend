@@ -46,8 +46,6 @@ export const resourceService = {
       if (options.isActive !== undefined) queryParams.append('isActive', options.isActive);
 
       const url = `${API_BASE_URL}/resources?${queryParams}`;
-      console.log('🔗 Fetching resources from:', url);
-      console.log('📋 Query options:', options);
 
       const response = await fetch(url, {
         method: 'GET',
@@ -59,7 +57,6 @@ export const resourceService = {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        console.error('❌ Backend error:', errorData);
         throw new Error(`HTTP ${response.status}: ${errorData.message || 'Failed to fetch resources'}`);
       }
 
@@ -99,8 +96,6 @@ export const resourceService = {
       if (options.isActive !== undefined) queryParams.append('isActive', options.isActive);
 
       const url = `${API_BASE_URL}/departments/${departmentSlug}/resources?${queryParams}`;
-      console.log('🔗 Fetching resources from:', url);
-      console.log('📋 Query options:', options);
 
       const response = await fetch(url, {
         method: 'GET',
@@ -112,7 +107,6 @@ export const resourceService = {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        console.error('❌ Backend error:', errorData);
         throw new Error(`HTTP ${response.status}: ${errorData.message || 'Failed to fetch resources'}`);
       }
 

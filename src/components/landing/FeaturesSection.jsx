@@ -1,5 +1,9 @@
 import { Search, Zap, Users, BookOpen, Target, Globe } from 'lucide-react';
 
+/**
+ * Features section highlighting key benefits of the GDG Resource Hub
+ * Displays 6 feature cards in a responsive grid layout
+ */
 export const FeaturesSection = () => {
   const features = [
     {

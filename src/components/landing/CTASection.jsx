@@ -1,6 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 
+/**
+ * Call-to-action section encouraging users to sign up
+ * Features a prominent CTA button with Google Blue background and decorative elements
+ */
 export const CTASection = () => {
   const navigate = useNavigate();
 

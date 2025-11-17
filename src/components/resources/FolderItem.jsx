@@ -5,6 +5,15 @@ const FOLDER_IMAGES = {
   red: '/folderred.png',
 };
 
+/**
+ * Folder item component displaying a colored folder image with name overlay
+ * @param {Object} props - Component props
+ * @param {string} props.name - Folder display name
+ * @param {string} props.color - Folder color theme (blue, yellow, green, red)
+ * @param {Function} props.onClick - Click handler
+ * @param {string} props.department - Department name
+ * @param {string} props.folderType - Type of folder (projects, events, templates, guides)
+ */
 export const FolderItem = ({ name, color = 'blue', onClick, department, folderType }) => {
   const folderImage = FOLDER_IMAGES[color] || FOLDER_IMAGES.blue;
 

@@ -32,7 +32,6 @@ export const getAllEvents = async (options = {}) => {
     if (options.isActive !== undefined) params.append('isActive', options.isActive);
 
     const url = `${API_URL}/events?${params.toString()}`;
-    console.log('📅 Fetching events from:', url);
 
     const response = await fetch(url);
     const result = await response.json();
@@ -118,7 +117,6 @@ export const createEvent = async (eventData) => {
       throw new Error(result.message || 'Failed to create event');
     }
 
-    console.log('✅ Event created:', result.data);
     return result.data;
   } catch (error) {
     console.error('❌ Event creation error:', error);
@@ -155,7 +153,6 @@ export const updateEvent = async (id, updateData) => {
       throw new Error(result.message || 'Failed to update event');
     }
 
-    console.log('✅ Event updated:', result.data);
     return result.data;
   } catch (error) {
     console.error('❌ Event update error:', error);
@@ -188,7 +185,6 @@ export const deleteEvent = async (id) => {
       throw new Error(result.message || 'Failed to delete event');
     }
 
-    console.log('✅ Event deleted');
     return result;
   } catch (error) {
     console.error('❌ Event deletion error:', error);

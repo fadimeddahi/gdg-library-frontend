@@ -1,3 +1,8 @@
+/**
+ * Footer component with navigation links and department list
+ * @param {Object} props - Component props
+ * @param {Array} props.departments - Array of department objects for footer links
+ */
 export const Footer = ({ departments }) => {
   return (
     <footer className="bg-slate-950 text-slate-400 py-16 md:py-20">

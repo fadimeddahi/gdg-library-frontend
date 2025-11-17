@@ -32,7 +32,6 @@ export const getAllTemplates = async (options = {}) => {
     if (options.isActive !== undefined) params.append('isActive', options.isActive);
 
     const url = `${API_URL}/templates?${params.toString()}`;
-    console.log('📋 Fetching templates from:', url);
 
     const response = await fetch(url);
     const result = await response.json();
@@ -118,7 +117,6 @@ export const createTemplate = async (templateData) => {
       throw new Error(result.message || 'Failed to create template');
     }
 
-    console.log('✅ Template created:', result.data);
     return result.data;
   } catch (error) {
     console.error('❌ Template creation error:', error);
@@ -155,7 +153,6 @@ export const updateTemplate = async (id, updateData) => {
       throw new Error(result.message || 'Failed to update template');
     }
 
-    console.log('✅ Template updated:', result.data);
     return result.data;
   } catch (error) {
     console.error('❌ Template update error:', error);
@@ -188,7 +185,6 @@ export const deleteTemplate = async (id) => {
       throw new Error(result.message || 'Failed to delete template');
     }
 
-    console.log('✅ Template deleted');
     return result;
   } catch (error) {
     console.error('❌ Template deletion error:', error);

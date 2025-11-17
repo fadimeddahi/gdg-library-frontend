@@ -32,7 +32,6 @@ export const getAllProjects = async (options = {}) => {
     if (options.isActive !== undefined) params.append('isActive', options.isActive);
 
     const url = `${API_URL}/projects?${params.toString()}`;
-    console.log('📦 Fetching projects from:', url);
 
     const response = await fetch(url);
     const result = await response.json();
@@ -154,7 +153,6 @@ export const updateProject = async (id, updateData) => {
       throw new Error(result.message || 'Failed to update project');
     }
 
-    console.log('✅ Project updated:', result.data);
     return result.data;
   } catch (error) {
     console.error('❌ Project update error:', error);
@@ -187,7 +185,6 @@ export const deleteProject = async (id) => {
       throw new Error(result.message || 'Failed to delete project');
     }
 
-    console.log('✅ Project deleted');
     return result;
   } catch (error) {
     console.error('❌ Project deletion error:', error);

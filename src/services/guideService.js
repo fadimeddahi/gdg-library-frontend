@@ -32,7 +32,6 @@ export const getAllGuides = async (options = {}) => {
     if (options.isActive !== undefined) params.append('isActive', options.isActive);
 
     const url = `${API_URL}/guides?${params.toString()}`;
-    console.log('📚 Fetching guides from:', url);
 
     const response = await fetch(url);
     const result = await response.json();
@@ -118,7 +117,6 @@ export const createGuide = async (guideData) => {
       throw new Error(result.message || 'Failed to create guide');
     }
 
-    console.log('✅ Guide created:', result.data);
     return result.data;
   } catch (error) {
     console.error('❌ Guide creation error:', error);
@@ -155,7 +153,6 @@ export const updateGuide = async (id, updateData) => {
       throw new Error(result.message || 'Failed to update guide');
     }
 
-    console.log('✅ Guide updated:', result.data);
     return result.data;
   } catch (error) {
     console.error('❌ Guide update error:', error);
@@ -188,7 +185,6 @@ export const deleteGuide = async (id) => {
       throw new Error(result.message || 'Failed to delete guide');
     }
 
-    console.log('✅ Guide deleted');
     return result;
   } catch (error) {
     console.error('❌ Guide deletion error:', error);

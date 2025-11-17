@@ -5,6 +5,14 @@ const FOLDER_COLORS = {
   red: 'bg-red-500 hover:bg-red-600',
 };
 
+/**
+ * Folder card component with colored background and resource count
+ * @param {Object} props - Component props
+ * @param {string} props.name - Folder name
+ * @param {number} props.resourceCount - Number of resources in folder
+ * @param {string} props.color - Folder color (blue, yellow, green, red)
+ * @param {Function} props.onClick - Click handler for navigation
+ */
 export const FolderCard = ({ 
   name, 
   resourceCount = 0, 

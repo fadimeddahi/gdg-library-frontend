@@ -1,3 +1,7 @@
+/**
+ * Main header component displaying the GDG logo and site title
+ * Shown on authenticated pages with centered layout
+ */
 export const Header = () => {
   return (
     <header className="flex items-center justify-center py-4 bg-white border-b border-gray-200">
