@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom';
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import './App.css'
 import { Sidebar } from './components/layout/Sidebar'
